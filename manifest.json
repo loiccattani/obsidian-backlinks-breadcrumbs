@@ -1,0 +1,10 @@
+{
+    "id": "backlinks-breadcrumbs",
+    "name": "Backlinks Breacrumbs",
+    "version": "0.0.1",
+    "minAppVersion": "0.15",
+    "description": " A simple and lightweight breadcrumbs navigation of backlinks back to your Home/Index file.",
+    "author": "Loïc Cattani",
+    "authorUrl": "https://github.com/loiccattani/backlinks-breadcrumbs",
+    "isDesktopOnly": true
+}
