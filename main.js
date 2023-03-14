@@ -24,7 +24,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         this.addSettingTab(new BacklinksBreadcrumbsSettingTab(this.app, this));
         
         app.workspace.onLayoutReady(async () => {
-            await this.drawBreadcrumbs();
+            this.drawBreadcrumbs();
             this.registerLayoutChangeEvent();
         });
     }
@@ -41,7 +41,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         await this.saveData(this.settings);
     }
     
-    async drawBreadcrumbs () {
+    drawBreadcrumbs () {
         const backlinks = this.processBacklinks();
         const breadcrumbs = this.generateBreadCrumbs(backlinks);
         
@@ -129,8 +129,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         });
         link.innerText = this.getFileBaseNameFromPath(target);
         link.addEventListener('click', async (e) => {
-            await openOrSwitch(target, e)
-        })
+            await openOrSwitch(target, e); // This async/await is useless
+        });
         return link;
     }
     
