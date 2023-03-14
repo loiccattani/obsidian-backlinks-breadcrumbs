@@ -145,15 +145,22 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
 
 module.exports = BacklinksBreadcrumbsPlugin;
 
-// FIXME: import { openOrSwitch } from "obsidian-community-lib";
+// Cherry picked from Obsidian-community-lib #c9aeb89 for brevity, with light reformatting
+// Source: https://github.com/obsidian-community/obsidian-community-lib/blob/3721e6f73c610c59a95c8f6eb9c361f625050353/dist/utils.js#L180
+// Doc: https://obsidian-community.github.io/obsidian-community-lib/modules.html#openOrSwitch
+// License: ISC
 async function openOrSwitch(dest, event, options = { createNewFile: true }) {
     const { workspace } = app;
     let destFile = app.metadataCache.getFirstLinkpathDest(dest, "");
+    // If dest doesn't exist, make it
     if (!destFile && options.createNewFile) {
         destFile = await createNewMDNote(dest);
-    } else if (!destFile && !options.createNewFile)
-    return;
+    } else if (!destFile && !options.createNewFile) {
+        return;
+    }
+    // Check if it's already open
     const leavesWithDestAlreadyOpen = [];
+    // For all open leaves, if the leave's basename is equal to the link destination, rather activate that leaf instead of opening it in two panes
     workspace.iterateAllLeaves((leaf) => {
         var _a;
         if (leaf.view instanceof obsidian.MarkdownView) {
@@ -163,11 +170,15 @@ async function openOrSwitch(dest, event, options = { createNewFile: true }) {
             }
         }
     });
+    // Rather switch to it if it is open
     if (leavesWithDestAlreadyOpen.length > 0) {
         workspace.setActiveLeaf(leavesWithDestAlreadyOpen[0]);
     } else {
         const mode = app.vault.getConfig("defaultViewMode");
-        const leaf = event.ctrlKey || event.getModifierState("Meta") ? workspace.splitActiveLeaf() : workspace.getUnpinnedLeaf();
+        const leaf = event.ctrlKey || event.getModifierState("Meta")
+            ? workspace.splitActiveLeaf()
+            : workspace.getUnpinnedLeaf();
+            // This is not how a ternary operator should be used
         await leaf.openFile(destFile, { active: true, mode });
     }
 }
