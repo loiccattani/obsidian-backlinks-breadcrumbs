@@ -54,7 +54,13 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
             const breadcrumbsEl = createDiv({
                 cls: `backlinks-breadcrumbs`,
                 attr: {
-                    style: `margin-top: calc(var(--file-margins) * -1);margin-bottom: 1em;font-size: var(--font-ui-small);width: 100%;color: var(--text-muted);`
+                    style: `
+                        max-width: var(--file-line-width);
+                        margin: 0 auto 0.5em auto;
+                        font-size: var(--font-ui-small);
+                        width: 100%;
+                        color: var(--text-muted);
+                    `
                 }
             });
             
@@ -63,7 +69,12 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
                 breadcrumbsEl.appendChild(l);
                 if (i < a.length - 1) breadcrumbsEl.append(` ${this.settings.separator} `);
             });
-            activeMDView.contentEl.querySelector('.cm-sizer').prepend(breadcrumbsEl);
+            const mode = activeMDView.getMode() || 'source';
+            if (mode === 'source') {
+                activeMDView.contentEl.querySelector('.cm-sizer').prepend(breadcrumbsEl);
+            } else {
+                activeMDView.contentEl.querySelector('.markdown-preview-view').prepend(breadcrumbsEl);
+            }
         }
     }
     
@@ -125,7 +136,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         const link = createEl('span', {
             cls: 'internal-link',
             attr: {
-                style: 'cursor: var(--cursor-link);'
+                style: 'cursor: var(--cursor-link);text-decoration: none;'
             }
         });
         link.innerText = this.getFileBaseNameFromPath(target);
