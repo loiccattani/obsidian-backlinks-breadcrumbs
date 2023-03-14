@@ -202,6 +202,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
             .setValue(this.plugin.settings.home)
             .onChange(async (value) => {
                 this.plugin.settings.home = value;
+                this.plugin.drawBreadcrumbs();
                 await this.plugin.saveSettings();
             })
         );
@@ -214,6 +215,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
             .setValue(this.plugin.settings.separator)
             .onChange(async (value) => {
                 this.plugin.settings.separator = value;
+                this.plugin.drawBreadcrumbs();
                 await this.plugin.saveSettings();
             })
         );
@@ -226,6 +228,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
             .setValue(this.plugin.settings.maxDepth)
             .onChange(async (value) => {
                 this.plugin.settings.maxDepth = value;
+                this.plugin.drawBreadcrumbs();
                 await this.plugin.saveSettings();
             })
         );
@@ -237,6 +240,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
             .setValue(this.plugin.settings.displayCurrentFile)
             .onChange(async (value) => {
                 this.plugin.settings.displayCurrentFile = value;
+                this.plugin.drawBreadcrumbs();
                 await this.plugin.saveSettings();
             })
         );
