@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS = {
 class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerLayoutChangeEvent() {
         this.layoutChange = app.workspace.on("layout-change", async () => {
-            await this.drawBreadcrumbs();
+            this.drawBreadcrumbs();
         });
         this.registerEvent(this.layoutChange);
     }
