@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS = {
     maxDepth: '5',
     separator: '→',
     displayCurrentFile: false,
+    showNoticeOnAmbiguity: true,
 };
 
 class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
@@ -85,7 +86,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
             
             if (backlinksCount && filepath !== this.settings.home + '.md') {
                 // Alert the user about the ambiguity of the ancestry
-                if (backlinksCount > 1) {
+                if (backlinksCount > 1 && this.settings.showNoticeOnAmbiguity) {
                     new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Name of file`, 10000);
                 }
                 
@@ -225,6 +226,17 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
             .setValue(this.plugin.settings.displayCurrentFile)
             .onChange(async (value) => {
                 this.plugin.settings.displayCurrentFile = value;
+                await this.plugin.saveSettings();
+            })
+        );
+        
+        new obsidian.Setting(containerEl)
+        .setName('Show Notice if ambiguous ancestry')
+        .setDesc('Display a notice if there is more than one backlink from the currently opened file. You can add the parent:: name_of_file metadata to lift this ambiguity.')
+        .addToggle(toggle => toggle
+            .setValue(this.plugin.settings.showNoticeOnAmbiguity)
+            .onChange(async (value) => {
+                this.plugin.settings.showNoticeOnAmbiguity = value;
                 await this.plugin.saveSettings();
             })
         );
