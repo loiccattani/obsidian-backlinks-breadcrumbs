@@ -11,10 +11,18 @@ const DEFAULT_SETTINGS = {
 
 class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerLayoutChangeEvent() {
-        this.layoutChange = app.workspace.on("layout-change", async () => {
+        this.registerEvent(app.workspace.on('layout-change', async () => {
             this.drawBreadcrumbs();
-        });
-        this.registerEvent(this.layoutChange);
+        }));
+    }
+
+    registerMetadataCacheEvent() {
+        const activeFile = app.workspace.getActiveFile();
+        this.registerEvent(app.metadataCache.on('dataview:metadata-change', (type, file) => {
+            if (type === 'update' && file.path === activeFile.path) {
+                this.drawBreadcrumbs();
+            }
+        }));
     }
     
     async onload() {
@@ -27,6 +35,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         app.workspace.onLayoutReady(async () => {
             this.drawBreadcrumbs();
             this.registerLayoutChangeEvent();
+            this.registerMetadataCacheEvent();
         });
     }
     
