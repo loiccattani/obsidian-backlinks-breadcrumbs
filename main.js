@@ -97,26 +97,29 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     
     getBacklinksForFile(file, result = []) {
         if (file) {
+            let backlink;
             const backlinks = app.metadataCache.getBacklinksForFile(file).data;
             const backlinksCount = Object.keys(backlinks).length;
             
             // Add the currently opened file as a first element
             if (result.length === 0 && this.settings.displayCurrentFile) result.push(file.path);
-            
-            if (backlinksCount && file.path !== this.settings.home + '.md') {
-                let backlink;
 
-                const dataviewApi = app.plugins.plugins.dataview?.api;
-                if (dataviewApi) {
-                    const parent = dataviewApi.page(file.path)?.parent;
-                    if (parent) {
-                        // We got a parent through the dataview's inline field `parent:: some_file`
-                        backlink = parent;
-                    }
-                } else {
-                    // Nothing. Should we alert of the potential utility of dataview?
+            // First, let's find out if we have a parent metadata for this file
+            // Why use dataview ? To be able to use inline fields as well as Frontmatter
+            const dataviewApi = app.plugins.plugins.dataview?.api;
+            if (dataviewApi) {
+                const parent = dataviewApi.page(file.path)?.parent;
+                if (parent) {
+                    backlink = parent + '.md';
                 }
+            } else {
+                // No dataview API. Should we alert of the potential utility of dataview?
+                // TODO: Should we look into frontmatter data then ?
+            }
 
+            // Next, if we have one or more backlinks
+            // Unless we are on the Home file
+            if ((backlink || backlinksCount) && file.path !== this.settings.home + '.md') {
                 if (!backlink && backlinksCount > 1 && this.settings.showNoticeOnAmbiguity) {
                     // Alert the user about the ambiguity of the ancestry
                     new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Name of file`, 10000);
