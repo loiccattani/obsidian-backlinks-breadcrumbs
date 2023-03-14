@@ -88,21 +88,35 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     
     getBacklinksForFile(file, result = []) {
         if (file) {
-            const filepath = file.path;
             const backlinks = app.metadataCache.getBacklinksForFile(file).data;
             const backlinksCount = Object.keys(backlinks).length;
             
             // Add the currently opened file as a first element
-            if (result.length === 0 && this.settings.displayCurrentFile) result.push(filepath);
+            if (result.length === 0 && this.settings.displayCurrentFile) result.push(file.path);
             
-            if (backlinksCount && filepath !== this.settings.home + '.md') {
-                // Alert the user about the ambiguity of the ancestry
-                if (backlinksCount > 1 && this.settings.showNoticeOnAmbiguity) {
+            if (backlinksCount && file.path !== this.settings.home + '.md') {
+                let backlink;
+
+                const dataviewApi = app.plugins.plugins.dataview?.api;
+                if (dataviewApi) {
+                    const parent = dataviewApi.page(file.path)?.parent;
+                    if (parent) {
+                        // We got a parent through the dataview's inline field `parent:: some_file`
+                        backlink = parent;
+                    }
+                } else {
+                    // Nothing. Should we alert of the potential utility of dataview?
+                }
+
+                if (!backlink && backlinksCount > 1 && this.settings.showNoticeOnAmbiguity) {
+                    // Alert the user about the ambiguity of the ancestry
                     new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Name of file`, 10000);
                 }
-                
-                // Keep only the first backlink
-                const backlink = Object.keys(backlinks)[0];
+
+                if (!backlink) {
+                    // Keep only the first backlink
+                    backlink = Object.keys(backlinks)[0];
+                }
                 
                 // Add it to the result
                 result.unshift(backlink);
