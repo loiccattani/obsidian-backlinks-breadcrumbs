@@ -142,7 +142,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
             parent = app.metadataCache.getFileCache(file)?.frontmatter?.parent;
         }
 
-        // Have we fount a parent metadata ?
+        // Have we found a parent metadata ?
         if (parent) {
             const parentFile = this.getFileByPath(parent + '.md');
             // Ensure we have a valid parent path metadata

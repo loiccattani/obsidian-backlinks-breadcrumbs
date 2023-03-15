@@ -1,6 +1,8 @@
 # Obsidian Backlinks Breadcrumbs
 
-A simple and lightweight Obsidian plugin to display a breadcrumbs navigation of backlinks back to your Home/Index file.
+![javascript](https://badges.aleen42.com/src/javascript.svg)
+
+A simple and lightweight Obsidian plugin to display a breadcrumbs navigation from backlinks back to your Home/Index file.
 
 The breadcrumbs are inserted on top of the page's content (above the inline title, if present). See screenshot below:
 
