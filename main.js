@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
 class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerLayoutChangeEvent() {
         this.registerEvent(app.workspace.on('layout-change', async () => {
+            // This event fires when navigating from links and files
             this.drawBreadcrumbs();
         }));
     }
@@ -19,6 +20,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerMetadataCacheEvent() {
         const activeFile = app.workspace.getActiveFile();
         this.registerEvent(app.metadataCache.on('dataview:metadata-change', (type, file) => {
+            // This event fires when dataview metadata is updated,
+            // Looks like every 2 seconds after the user types anything
             if (type === 'update' && file.path === activeFile.path) {
                 this.drawBreadcrumbs();
             }
@@ -26,14 +29,13 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
     
     async onload() {
-        await this.loadSettings();
-        
         console.log('loading Backlinks Breadcrumbs plugin');
+
+        await this.loadSettings();
         
         this.addSettingTab(new BacklinksBreadcrumbsSettingTab(this.app, this));
         
         app.workspace.onLayoutReady(async () => {
-            this.drawBreadcrumbs();
             this.registerLayoutChangeEvent();
             this.registerMetadataCacheEvent();
         });
@@ -52,7 +54,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
     
     drawBreadcrumbs () {
-        const backlinks = this.processBacklinks();
+        const file = app.workspace.getActiveFile();
+        const backlinks = this.processBacklinks(file);
         const breadcrumbs = this.generateBreadCrumbs(backlinks);
         
         const activeMDView = app.workspace.getActiveViewOfType(obsidian.MarkdownView);
@@ -87,59 +90,65 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         }
     }
     
-    processBacklinks() {
-        const file = app.workspace.getActiveFile();
-        if (file) {
-            const backlinks = this.getBacklinksForFile(file);
-            return backlinks;
-        }
-    }
-    
-    getBacklinksForFile(file, result = []) {
-        if (file) {
+    processBacklinks(file, result = []) {
+        if (file && !this.isHome(file.path)) {
             let backlink;
-            const backlinks = app.metadataCache.getBacklinksForFile(file).data;
-            const backlinksCount = Object.keys(backlinks).length;
+            const backlinksObject = app.metadataCache.getBacklinksForFile(file).data;
+            const backlinks = Object.keys(backlinksObject); //An array of paths with extensions
             
             // Add the currently opened file as a first element
             if (result.length === 0 && this.settings.displayCurrentFile) result.push(file.path);
 
-            // First, let's find out if we have a parent metadata for this file
-            // Why use dataview ? To be able to use inline fields as well as Frontmatter
-            const dataviewApi = app.plugins.plugins.dataview?.api;
-            if (dataviewApi) {
-                const parent = dataviewApi.page(file.path)?.parent;
-                if (parent) {
-                    backlink = parent + '.md';
-                }
-            } else {
-                // No dataview API. Should we alert of the potential utility of dataview?
-                // TODO: Should we look into frontmatter data then ?
-            }
+            // Let's find out if we have a parent metadata for this file from
+            // dataview's inline fields or from Frontmatter.
+            // If so, it will take precedence over this file's backlinks
+            backlink = this.getParentFromMetadata(file);
 
-            // Next, if we have one or more backlinks
-            // Unless we are on the Home file
-            if ((backlink || backlinksCount) && file.path !== this.settings.home + '.md') {
-                if (!backlink && backlinksCount > 1 && this.settings.showNoticeOnAmbiguity) {
-                    // Alert the user about the ambiguity of the ancestry
-                    new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Name of file`, 10000);
-                }
-
+            // Next, ensure we have one or more backlinks
+            if (backlink || backlinks.length) {
+                // If we don't have a backlink from parent metadata,
                 if (!backlink) {
-                    // Keep only the first backlink
-                    backlink = Object.keys(backlinks)[0];
+                    // If there is more than one backlink, alert the
+                    // user about the ambiguity of the ancestry
+                    if (backlinks.length > 1 && this.settings.showNoticeOnAmbiguity) {
+                        new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Path-to-file`, 10000);
+                    }
+
+                    // Take the first backlink
+                    backlink = backlinks[0]; // FIXME: This is naive, can we do better ?
                 }
                 
-                // Add it to the result
+                // Add it in front of the result array
                 result.unshift(backlink);
                 
                 // Continue recursively until at Home or reached the maximum depth
-                if (backlink !== this.settings.home + '.md' && result.length < Number(this.settings.maxDepth)) {
-                    this.getBacklinksForFile(this.getFileByPath(backlink), result);
+                if (!this.isHome(backlink) && result.length < Number(this.settings.maxDepth)) {
+                    this.processBacklinks(this.getFileByPath(backlink), result);
                 }
             }
         }
         return result;
+    }
+
+    getParentFromMetadata(file) {
+        // Why use dataview ? To be able to use inline fields as well as Frontmatter
+        const dataviewApi = app.plugins.plugins.dataview?.api;
+        if (dataviewApi) {
+            const parent = dataviewApi.page(file.path)?.parent;
+            const parentFile = this.getFileByPath(parent + '.md');
+            // Ensure we have a valid parent path metadata
+            if (parentFile) {
+                return parentFile.path;
+            }
+        } else {
+            // No dataview API. Should we alert of the potential utility of dataview?
+            // TODO: Should we look into frontmatter data as well ?
+        }
+        return null;
+    }
+
+    isHome(path) {
+        return path === this.settings.home + '.md';
     }
     
     getFileByPath(path) {
@@ -147,14 +156,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
     
     generateBreadCrumbs(backlinks) {
-        if (backlinks) {
-            const breadcrumbs = [];
-            
-            backlinks.forEach(path => {
-                breadcrumbs.push(this.createLink(path));
-            });
-            
-            return breadcrumbs;
+        if (backlinks.length) {
+            return backlinks.map(path => this.createLink(path));
         }
     }
     
