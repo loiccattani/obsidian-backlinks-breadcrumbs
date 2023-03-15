@@ -5,7 +5,7 @@
     "minAppVersion": "0.15",
     "description": "A simple and lightweight Obsidian plugin to display a breadcrumbs navigation of backlinks back to your Home/Index file.",
     "author": "Loïc Cattani",
-    "authorUrl": "https://github.com/loiccattani/backlinks-breadcrumbs",
+    "authorUrl": "https://github.com/loiccattani/obsidian-backlinks-breadcrumbs",
     "isDesktopOnly": true,
     "fundingUrl": "https://www.buymeacoffee.com/loiccattani"
 }

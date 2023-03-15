@@ -1,4 +1,4 @@
-# Backlinks Breadcrumbs
+# Obsidian Backlinks Breadcrumbs
 
 A simple and lightweight Obsidian plugin to display a breadcrumbs navigation of backlinks back to your Home/Index file.
 
