@@ -1,6 +1,6 @@
 {
   "name": "obsidian-backlinks-breadcrumbs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple and lightweight Obsidian plugin to display a breadcrumbs navigation from backlinks back to your Home/Index file.",
   "private": true,
   "main": "main.js",
