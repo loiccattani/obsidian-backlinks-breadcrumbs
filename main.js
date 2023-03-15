@@ -54,10 +54,11 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         const breadcrumbs = this.generateBreadCrumbs(backlinks);
 
         const activeMDView = app.workspace.getActiveViewOfType(obsidian.MarkdownView);
-        if (breadcrumbs && activeMDView) {
-            // Destroy the backlinks breadcrumbs element if it exists
-            activeMDView.contentEl.querySelector('.backlinks-breadcrumbs')?.remove();
 
+        // Destroy the backlinks breadcrumbs element if it exists
+        activeMDView?.contentEl?.querySelector('.backlinks-breadcrumbs')?.remove();
+
+        if (breadcrumbs && activeMDView) {
             const breadcrumbsEl = createDiv({
                 cls: 'backlinks-breadcrumbs',
                 attr: {
