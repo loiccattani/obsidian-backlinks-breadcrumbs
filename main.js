@@ -21,7 +21,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         this.registerEvent(app.metadataCache.on('dataview:metadata-change', (type, file) => {
             // This event fires when Dataview metadata is updated,
             // Looks like every 2 seconds after the user types anything
-            if (type === 'update' && file.path === activeFile.path) {
+            if (type === 'update' && file.path === activeFile?.path) {
                 this.drawBreadcrumbs();
             }
         }));
