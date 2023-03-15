@@ -132,19 +132,25 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
 
     getParentFromMetadata(file) {
+        let parent;
         // Why use Dataview ? To be able to use inline fields as well as Front Matter
         const dataviewApi = app.plugins.plugins.dataview?.api;
         if (dataviewApi) {
-            const parent = dataviewApi.page(file.path)?.parent;
+            parent = dataviewApi.page(file.path)?.parent;
+        } else {
+            // No Dataview API, let's try Front Matter
+            parent = app.metadataCache.getFileCache(file)?.frontmatter?.parent;
+        }
+
+        // Have we fount a parent metadata ?
+        if (parent) {
             const parentFile = this.getFileByPath(parent + '.md');
             // Ensure we have a valid parent path metadata
             if (parentFile) {
                 return parentFile.path;
             }
-        } else {
-            // No Dataview API. Should we alert of the potential utility of Dataview?
-            // TODO: Should we look into Front Matter data as well ?
         }
+        
         return null;
     }
 
