@@ -51,6 +51,10 @@ There is a few settings you can change from Obsidian's Settings:
 - *Show current file*: do you want the current file name to be displayed as the first breadcrumb ?
 - *Show notice if ambiguous ancestry*: a toggle to show a notice in case of multiple backlinks and absence of parent metadata.
 
+## Credits
+
+- Cherry picked the `openOrSwitch` function from [Obsidian-community-lib](https://github.com/obsidian-community/obsidian-community-lib)
+
 ## Support
 
 This plugin is provided for free. If you found this plugin useful and want to support my work I'll gladly accept a small donation.
