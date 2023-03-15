@@ -1,4 +1,3 @@
-//import { Plugin } from 'obsidian';
 const obsidian = require('obsidian');
 
 const DEFAULT_SETTINGS = {
@@ -11,7 +10,7 @@ const DEFAULT_SETTINGS = {
 
 class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerLayoutChangeEvent() {
-        this.registerEvent(app.workspace.on('layout-change', async () => {
+        this.registerEvent(app.workspace.on('layout-change', () => {
             // This event fires when navigating from links and files
             this.drawBreadcrumbs();
         }));
@@ -35,7 +34,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         
         this.addSettingTab(new BacklinksBreadcrumbsSettingTab(this.app, this));
         
-        app.workspace.onLayoutReady(async () => {
+        app.workspace.onLayoutReady(() => {
             this.registerLayoutChangeEvent();
             this.registerMetadataCacheEvent();
         });
@@ -81,6 +80,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
                 breadcrumbsEl.appendChild(l);
                 if (i < a.length - 1) breadcrumbsEl.append(` ${this.settings.separator} `);
             });
+
+            // Add the div to the view
             const mode = activeMDView.getMode() || 'source';
             if (mode === 'source') {
                 activeMDView.contentEl.querySelector('.cm-sizer').prepend(breadcrumbsEl);
@@ -169,8 +170,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
             }
         });
         link.innerText = this.getFileBaseNameFromPath(target);
-        link.addEventListener('click', async (e) => {
-            await openOrSwitch(target, e); // This async/await is useless
+        link.addEventListener('click', (e) => {
+            openOrSwitch(target, e); // This async/await is useless
         });
         return link;
     }
