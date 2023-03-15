@@ -19,7 +19,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerMetadataCacheEvent() {
         const activeFile = app.workspace.getActiveFile();
         this.registerEvent(app.metadataCache.on('dataview:metadata-change', (type, file) => {
-            // This event fires when dataview metadata is updated,
+            // This event fires when Dataview metadata is updated,
             // Looks like every 2 seconds after the user types anything
             if (type === 'update' && file.path === activeFile.path) {
                 this.drawBreadcrumbs();
@@ -101,7 +101,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
             if (result.length === 0 && this.settings.displayCurrentFile) result.push(file.path);
 
             // Let's find out if we have a parent metadata for this file from
-            // dataview's inline fields or from Frontmatter.
+            // Dataview's inline fields or from Front Matter.
             // If so, it will take precedence over this file's backlinks
             backlink = this.getParentFromMetadata(file);
 
@@ -132,7 +132,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
 
     getParentFromMetadata(file) {
-        // Why use dataview ? To be able to use inline fields as well as Frontmatter
+        // Why use Dataview ? To be able to use inline fields as well as Front Matter
         const dataviewApi = app.plugins.plugins.dataview?.api;
         if (dataviewApi) {
             const parent = dataviewApi.page(file.path)?.parent;
@@ -142,8 +142,8 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
                 return parentFile.path;
             }
         } else {
-            // No dataview API. Should we alert of the potential utility of dataview?
-            // TODO: Should we look into frontmatter data as well ?
+            // No Dataview API. Should we alert of the potential utility of Dataview?
+            // TODO: Should we look into Front Matter data as well ?
         }
         return null;
     }
