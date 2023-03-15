@@ -262,7 +262,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
         );
         
         new obsidian.Setting(containerEl)
-        .setName('Maximum Depth')
+        .setName('Maximum depth')
         .setDesc('The maximum depth the plugin will go up the backlinks chain from the current openend file to find Home.')
         .addText(text => text
             .setPlaceholder(this.plugin.settings.maxDepth)
@@ -275,7 +275,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
         );
         
         new obsidian.Setting(containerEl)
-        .setName('Show Current File')
+        .setName('Show current file')
         .setDesc('Add the current openend file at the end of the breadcrumbs')
         .addToggle(toggle => toggle
             .setValue(this.plugin.settings.displayCurrentFile)
@@ -287,7 +287,7 @@ class BacklinksBreadcrumbsSettingTab extends obsidian.PluginSettingTab {
         );
         
         new obsidian.Setting(containerEl)
-        .setName('Show Notice if ambiguous ancestry')
+        .setName('Show notice if ambiguous ancestry')
         .setDesc('Display a notice if there is more than one backlink from the currently opened file. You can add the parent:: name_of_file metadata to lift this ambiguity.')
         .addToggle(toggle => toggle
             .setValue(this.plugin.settings.showNoticeOnAmbiguity)
