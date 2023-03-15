@@ -156,7 +156,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
 
     getFileByPath(path) {
-        return app.vault.getFiles().find(f => f.path === path);
+        return app.vault.getAbstractFileByPath(path);
     }
 
     generateBreadCrumbs(backlinks) {
