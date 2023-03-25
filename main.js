@@ -10,15 +10,15 @@ const DEFAULT_SETTINGS = {
 
 class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     registerLayoutChangeEvent() {
-        this.registerEvent(app.workspace.on('layout-change', () => {
+        this.registerEvent(this.app.workspace.on('layout-change', () => {
             // This event fires when navigating from links and files
             this.drawBreadcrumbs();
         }));
     }
 
     registerMetadataCacheEvent() {
-        const activeFile = app.workspace.getActiveFile();
-        this.registerEvent(app.metadataCache.on('dataview:metadata-change', (type, file) => {
+        const activeFile = this.app.workspace.getActiveFile();
+        this.registerEvent(this.app.metadataCache.on('dataview:metadata-change', (type, file) => {
             // This event fires when Dataview metadata is updated,
             // Looks like every 2 seconds after the user types anything
             if (type === 'update' && file.path === activeFile?.path) {
@@ -34,7 +34,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
 
         this.addSettingTab(new BacklinksBreadcrumbsSettingTab(this.app, this));
 
-        app.workspace.onLayoutReady(() => {
+        this.app.workspace.onLayoutReady(() => {
             this.registerLayoutChangeEvent();
             this.registerMetadataCacheEvent();
         });
@@ -49,11 +49,11 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
 
     drawBreadcrumbs () {
-        const file = app.workspace.getActiveFile();
+        const file = this.app.workspace.getActiveFile();
         const backlinks = this.processBacklinks(file);
         const breadcrumbs = this.generateBreadCrumbs(backlinks);
 
-        const activeMDView = app.workspace.getActiveViewOfType(obsidian.MarkdownView);
+        const activeMDView = this.app.workspace.getActiveViewOfType(obsidian.MarkdownView);
 
         // Destroy the backlinks breadcrumbs element if it exists
         activeMDView?.contentEl?.querySelector('.backlinks-breadcrumbs')?.remove();
@@ -91,7 +91,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     processBacklinks(file, result = []) {
         if (file && !this.isHome(file.path)) {
             let backlink;
-            const backlinksObject = app.metadataCache.getBacklinksForFile(file).data;
+            const backlinksObject = this.app.metadataCache.getBacklinksForFile(file).data;
             const backlinks = Object.keys(backlinksObject); // An array of paths with extensions
 
             // Add the currently opened file as a first element
@@ -108,6 +108,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
                 if (!backlink) {
                     // If there is more than one backlink, alert the
                     // user about the ambiguity of the ancestry
+                    console.log(backlinks)
                     if (backlinks.length > 1 && this.settings.showNoticeOnAmbiguity) {
                         new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Path-to-file`, 10000);
                     }
@@ -131,12 +132,12 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     getParentFromMetadata(file) {
         let parent;
         // Why use Dataview ? To be able to use inline fields as well as Front Matter
-        const dataviewApi = app.plugins.plugins.dataview?.api;
+        const dataviewApi = this.app.plugins.plugins.dataview?.api;
         if (dataviewApi) {
             parent = dataviewApi.page(file.path)?.parent;
         } else {
             // No Dataview API, let's try Front Matter
-            parent = app.metadataCache.getFileCache(file)?.frontmatter?.parent;
+            parent = this.app.metadataCache.getFileCache(file)?.frontmatter?.parent;
         }
 
         // Have we found a parent metadata ?
@@ -156,7 +157,7 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     }
 
     getFileByPath(path) {
-        return app.vault.getAbstractFileByPath(path);
+        return this.app.vault.getAbstractFileByPath(path);
     }
 
     generateBreadCrumbs(backlinks) {
