@@ -61,15 +61,6 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
         if (breadcrumbs && activeMDView) {
             const breadcrumbsEl = createDiv({
                 cls: 'backlinks-breadcrumbs',
-                attr: {
-                    style: `
-                        max-width: var(--file-line-width);
-                        margin: 0 auto 0.5em auto;
-                        font-size: var(--font-ui-small);
-                        width: 100%;
-                        color: var(--text-muted);
-                    `,
-                },
             });
 
             // Add each breadcrumb to the div
@@ -172,9 +163,6 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
     createLink(target) {
         const link = createEl('span', {
             cls: 'internal-link',
-            attr: {
-                style: 'cursor: var(--cursor-link);text-decoration: none;',
-            },
         });
         link.innerText = this.getFileBaseNameFromPath(target);
         link.addEventListener('click', (e) => {
