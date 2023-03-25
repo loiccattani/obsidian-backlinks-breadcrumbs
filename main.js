@@ -94,6 +94,10 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
             const backlinksObject = this.app.metadataCache.getBacklinksForFile(file).data;
             const backlinks = Object.keys(backlinksObject); // An array of paths with extensions
 
+            // Remove current file path from backlink if any (happens with internal links)
+            const index = backlinks.indexOf(file.path);
+            if (index > -1) backlinks.splice(index, 1);
+
             // Add the currently opened file as a first element
             if (result.length === 0 && this.settings.displayCurrentFile) result.push(file.path);
 
@@ -108,7 +112,6 @@ class BacklinksBreadcrumbsPlugin extends obsidian.Plugin {
                 if (!backlink) {
                     // If there is more than one backlink, alert the
                     // user about the ambiguity of the ancestry
-                    console.log(backlinks)
                     if (backlinks.length > 1 && this.settings.showNoticeOnAmbiguity) {
                         new Notice(`Backlinks Breadcrumbs:\nThe ancestry for "${file.basename}" is ambiguous!\nPlease specify it with parent:: Path-to-file`, 10000);
                     }
